@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On the Hour — 50 Front Pages, Refreshed Hourly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1613;
+    --paper: #f4ede0;
+    --paper-dark: #e8ddc7;
+    --red: #a8201a;
+    --rule: rgba(26, 22, 19, 0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    min-height: 100vh;
+  }
+  body {
+    background-image:
+      radial-gradient(ellipse at top, rgba(168,32,26,0.04), transparent 50%),
+      repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(26,22,19,0.015) 3px, rgba(26,22,19,0.015) 4px);
+  }
+  .masthead {
+    border-bottom: 4px double var(--ink);
+    padding: 28px 32px 20px;
+    text-align: center;
+    position: relative;
+  }
+  .masthead::before, .masthead::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 60px;
+    height: 1px;
+    background: var(--ink);
+  }
+  .masthead::before { left: 32px; }
+  .masthead::after { right: 32px; }
+  .edition {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+  h1 {
+    font-size: clamp(44px, 8vw, 96px);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 0.9;
+    font-style: italic;
+  }
+  .tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .tagline span { display: flex; align-items: center; gap: 6px; }
+  .dot {
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .controls {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .refresh-btn {
+    background: var(--red);
+    color: var(--paper);
+    border: none;
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.15s;
+  }
+  .refresh-btn:hover { transform: translateY(-1px); }
+  .refresh-btn:disabled { opacity: 0.5; cursor: wait; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    padding: 1px;
+  }
+  .card {
+    background: var(--paper);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 280px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .card:hover { background: var(--paper-dark); }
+  .card.loading { opacity: 0.4; }
+  .card.error::after {
+    content: 'FEED UNAVAILABLE';
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--red);
+  }
+  .outlet {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+  }
+  .outlet-region {
+    opacity: 0.5;
+    font-weight: 400;
+  }
+  .headline {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+  .headline a {
+    color: var(--ink);
+    text-decoration: none;
+    background-image: linear-gradient(var(--ink), var(--ink));
+    background-size: 0 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.3s;
+  }
+  .headline a:hover { background-size: 100% 1px; }
+  .description {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink);
+    opacity: 0.78;
+    flex: 1;
+    margin-bottom: 12px;
+    font-weight: 400;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .description::first-letter {
+    font-weight: 600;
+  }
+  .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    padding-top: 8px;
+    border-top: 1px dotted var(--rule);
+  }
+  .footer {
+    padding: 32px;
+    text-align: center;
+    border-top: 4px double var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    line-height: 1.8;
+  }
+  .countdown {
+    font-variant-numeric: tabular-nums;
+    color: var(--red);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="edition" id="edition-line">LOADING EDITION ·</div>
+    <h1>On the Hour</h1>
+    <div class="tagline">
+      <span><span class="dot"></span>LIVE</span>
+      <span>50 OUTLETS · ONE PAGE</span>
+      <span>EVERY HOUR, ON THE HOUR</span>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div>NEXT EDITION IN <span class="countdown" id="countdown">--:--</span></div>
+    <div id="status">INITIALIZING…</div>
+    <button class="refresh-btn" id="refreshBtn">REFRESH NOW</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <footer class="footer">
+    One page. Fifty outlets. Every hour, on the hour.<br>
+    Click any headline to open the original article
+  </footer>
+
+<script>
+// 50 major global news outlets with RSS feeds
+const OUTLETS = [
+  { name: "Reuters",         region: "Global",   rss: "https://feeds.reuters.com/reuters/topNews" },
+  { name: "Associated Press",region: "Global",   rss: "https://feeds.apnews.com/ApNews" },
+  { name: "BBC News",        region: "UK",       rss: "http://feeds.bbci.co.uk/news/rss.xml" },
+  { name: "The Guardian",    region: "UK",       rss: "https://www.theguardian.com/international/rss" },
+  { name: "The Times",       region: "UK",       rss: "https://www.thetimes.com/uk/rss" },
+  { name: "Financial Times", region: "UK",       rss: "https://www.ft.com/?format=rss" },
+  { name: "The Telegraph",   region: "UK",       rss: "https://www.telegraph.co.uk/news/rss.xml" },
+  { name: "Sky News",        region: "UK",       rss: "https://feeds.skynews.com/feeds/rss/world.xml" },
+  { name: "New York Times",  region: "US",       rss: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" },
+  { name: "Washington Post", region: "US",       rss: "https://feeds.washingtonpost.com/rss/world" },
+  { name: "Wall St Journal", region: "US",       rss: "https://feeds.content.dowjones.io/public/rss/RSSWorldNews" },
+  { name: "CNN",             region: "US",       rss: "http://rss.cnn.com/rss/edition.rss" },
+  { name: "NBC News",        region: "US",       rss: "http://feeds.nbcnews.com/nbcnews/public/news" },
+  { name: "CBS News",        region: "US",       rss: "https://www.cbsnews.com/latest/rss/main" },
+  { name: "ABC News",        region: "US",       rss: "https://abcnews.go.com/abcnews/topstories" },
+  { name: "Fox News",        region: "US",       rss: "https://moxie.foxnews.com/google-publisher/latest.xml" },
+  { name: "NPR",             region: "US",       rss: "https://feeds.npr.org/1001/rss.xml" },
+  { name: "USA Today",       region: "US",       rss: "https://rssfeeds.usatoday.com/usatoday-NewsTopStories" },
+  { name: "Politico",        region: "US",       rss: "https://rss.politico.com/politics-news.xml" },
+  { name: "The Atlantic",    region: "US",       rss: "https://www.theatlantic.com/feed/all/" },
+  { name: "Bloomberg",       region: "US",       rss: "https://feeds.bloomberg.com/markets/news.rss" },
+  { name: "Axios",           region: "US",       rss: "https://api.axios.com/feed/" },
+  { name: "The Hill",        region: "US",       rss: "https://thehill.com/news/feed/" },
+  { name: "Al Jazeera",      region: "Qatar",    rss: "https://www.aljazeera.com/xml/rss/all.xml" },
+  { name: "Deutsche Welle",  region: "Germany",  rss: "https://rss.dw.com/rdf/rss-en-all" },
+  { name: "Der Spiegel",     region: "Germany",  rss: "https://www.spiegel.de/international/index.rss" },
+  { name: "France 24",       region: "France",   rss: "https://www.france24.com/en/rss" },
+  { name: "Le Monde",        region: "France",   rss: "https://www.lemonde.fr/en/rss/une.xml" },
+  { name: "Euronews",        region: "EU",       rss: "https://www.euronews.com/rss" },
+  { name: "Politico EU",     region: "EU",       rss: "https://www.politico.eu/feed/" },
+  { name: "The Local",       region: "EU",       rss: "https://www.thelocal.com/feeds/rss.php" },
+  { name: "El País",         region: "Spain",    rss: "https://feeds.elpais.com/mrss-s/pages/ep/site/english.elpais.com/portada" },
+  { name: "ANSA",            region: "Italy",    rss: "https://www.ansa.it/english/english_rss.xml" },
+  { name: "NHK World",       region: "Japan",    rss: "https://www3.nhk.or.jp/nhkworld/en/news/feeds/" },
+  { name: "Japan Times",     region: "Japan",    rss: "https://www.japantimes.co.jp/feed/" },
+  { name: "South China MP",  region: "HK",       rss: "https://www.scmp.com/rss/91/feed" },
+  { name: "Xinhua",          region: "China",    rss: "http://www.xinhuanet.com/english/rss/worldrss.xml" },
+  { name: "Straits Times",   region: "Singapore",rss: "https://www.straitstimes.com/news/world/rss.xml" },
+  { name: "The Hindu",       region: "India",    rss: "https://www.thehindu.com/news/international/feeder/default.rss" },
+  { name: "Times of India",  region: "India",    rss: "https://timesofindia.indiatimes.com/rssfeeds/296589292.cms" },
+  { name: "Hindustan Times", region: "India",    rss: "https://www.hindustantimes.com/feeds/rss/world-news/rssfeed.xml" },
+  { name: "Dawn",            region: "Pakistan", rss: "https://www.dawn.com/feeds/home" },
+  { name: "Haaretz",         region: "Israel",   rss: "https://www.haaretz.com/cmlink/1.628752" },
+  { name: "Times of Israel", region: "Israel",   rss: "https://www.timesofisrael.com/feed/" },
+  { name: "The Moscow Times",region: "Russia",   rss: "https://www.themoscowtimes.com/rss/news" },
+  { name: "Kyiv Independent",region: "Ukraine",  rss: "https://kyivindependent.com/rss/" },
+  { name: "ABC Australia",   region: "Australia",rss: "https://www.abc.net.au/news/feed/51120/rss.xml" },
+  { name: "CBC",             region: "Canada",   rss: "https://www.cbc.ca/webfeed/rss/rss-topstories" },
+  { name: "Globe and Mail",  region: "Canada",   rss: "https://www.theglobeandmail.com/arc/outboundfeeds/rss/category/world/?outputType=xml" },
+  { name: "AllAfrica",       region: "Africa",   rss: "https://allafrica.com/tools/headlines/rdf/latest/headlines.rdf" }
+];
+
+const grid = document.getElementById('grid');
+const statusEl = document.getElementById('status');
+const countdownEl = document.getElementById('countdown');
+const editionEl = document.getElementById('edition-line');
+const refreshBtn = document.getElementById('refreshBtn');
+
+// Refresh at the top of every hour (:00)
+function msUntilTopOfHour() {
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(now.getHours() + 1, 0, 0, 0);
+  return next - now;
+}
+let nextRefresh = Date.now() + msUntilTopOfHour();
+
+function setEdition() {
+  const d = new Date();
+  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  editionEl.textContent = `EDITION · ${d.toLocaleDateString('en-US', opts).toUpperCase()} · ${time}`;
+}
+
+function renderSkeleton() {
+  grid.innerHTML = '';
+  OUTLETS.forEach((o, i) => {
+    const card = document.createElement('article');
+    card.className = 'card loading';
+    card.id = `card-${i}`;
+    card.innerHTML = `
+      <div class="outlet">
+        <span>${o.name}</span>
+        <span class="outlet-region">${o.region}</span>
+      </div>
+      <div class="headline">Loading headline…</div>
+      <div class="description">—</div>
+      <div class="meta">—</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+async function fetchHeadline(outlet, index) {
+  const card = document.getElementById(`card-${index}`);
+  try {
+    // Use rss2json public API (free tier, no key required for basic use)
+    const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(outlet.rss)}`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('fetch failed');
+    const data = await resp.json();
+    if (data.status !== 'ok' || !data.items || !data.items.length) throw new Error('no items');
+
+    const top = data.items[0];
+    const title = top.title || 'Untitled';
+    const link = top.link || '#';
+    const rawDesc = top.description || top.content || '';
+    // Strip HTML tags and decode basic entities, then trim
+    const tmp = document.createElement('div');
+    tmp.innerHTML = rawDesc;
+    let desc = (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+    // Some feeds repeat the title at the start of the description — remove it
+    if (desc.toLowerCase().startsWith(title.toLowerCase())) {
+      desc = desc.slice(title.length).replace(/^[\s\-–—:.]+/, '');
+    }
+    if (desc.length > 280) desc = desc.slice(0, 277).trimEnd() + '…';
+    if (!desc) desc = 'No summary provided by the feed.';
+
+    const pubDate = top.pubDate ? new Date(top.pubDate) : null;
+    const timeStr = pubDate ? pubDate.toLocaleString('en-US', {
+      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    }) : 'Recent';
+
+    card.classList.remove('loading');
+    card.querySelector('.headline').innerHTML =
+      `<a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>`;
+    card.querySelector('.description').textContent = desc;
+    card.querySelector('.meta').textContent = `PUBLISHED · ${timeStr}`;
+  } catch (err) {
+    card.classList.remove('loading');
+    card.classList.add('error');
+    card.querySelector('.headline').innerHTML =
+      `<a href="https://www.google.com/search?q=${encodeURIComponent(outlet.name + ' latest news')}" target="_blank" rel="noopener noreferrer" style="opacity:0.5">Visit ${outlet.name} →</a>`;
+    card.querySelector('.description').textContent = '';
+    card.querySelector('.meta').textContent = '';
+  }
+}
+
+async function loadAll() {
+  refreshBtn.disabled = true;
+  statusEl.textContent = 'FETCHING 50 FEEDS…';
+  setEdition();
+  renderSkeleton();
+
+  // Fetch in batches of 6 to avoid rate limiting
+  const batchSize = 6;
+  let done = 0;
+  for (let i = 0; i < OUTLETS.length; i += batchSize) {
+    const batch = OUTLETS.slice(i, i + batchSize);
+    await Promise.all(batch.map((o, j) => fetchHeadline(o, i + j)));
+    done = Math.min(i + batchSize, OUTLETS.length);
+    statusEl.textContent = `LOADED ${done}/${OUTLETS.length}`;
+  }
+
+  statusEl.textContent = `LAST UPDATED · ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+  nextRefresh = Date.now() + msUntilTopOfHour();
+  refreshBtn.disabled = false;
+}
+
+function updateCountdown() {
+  const diff = Math.max(0, nextRefresh - Date.now());
+  const mins = Math.floor(diff / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  countdownEl.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  if (diff <= 0) loadAll();
+}
+
+refreshBtn.addEventListener('click', loadAll);
+setInterval(updateCountdown, 1000);
+setInterval(setEdition, 60000);
+loadAll();
+</script>
+</body>
+</html>
