@@ -120,7 +120,7 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    min-height: 280px;
+    min-height: 320px;
     position: relative;
     transition: background 0.2s;
   }
@@ -177,10 +177,35 @@
     flex: 1;
     margin-bottom: 12px;
     font-weight: 400;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 8px;
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(26,22,19,0.3) transparent;
+    /* Soft fade at bottom hints at more content below */
+    mask-image: linear-gradient(to bottom, black calc(100% - 20px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 20px), transparent 100%);
+  }
+  /* Remove fade when scrolled to bottom or when content fits */
+  .description.at-end,
+  .description.fits {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  /* WebKit */
+  .description::-webkit-scrollbar {
+    width: 5px;
+  }
+  .description::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .description::-webkit-scrollbar-thumb {
+    background: rgba(26,22,19,0.25);
+    border-radius: 3px;
+  }
+  .description::-webkit-scrollbar-thumb:hover {
+    background: rgba(26,22,19,0.5);
   }
   .description::first-letter {
     font-weight: 600;
@@ -354,7 +379,6 @@ async function fetchHeadline(outlet, index) {
     if (desc.toLowerCase().startsWith(title.toLowerCase())) {
       desc = desc.slice(title.length).replace(/^[\s\-–—:.]+/, '');
     }
-    if (desc.length > 280) desc = desc.slice(0, 277).trimEnd() + '…';
     if (!desc) desc = 'No summary provided by the feed.';
 
     const pubDate = top.pubDate ? new Date(top.pubDate) : null;
@@ -365,7 +389,19 @@ async function fetchHeadline(outlet, index) {
     card.classList.remove('loading');
     card.querySelector('.headline').innerHTML =
       `<a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>`;
-    card.querySelector('.description').textContent = desc;
+    const descEl = card.querySelector('.description');
+    descEl.textContent = desc;
+    // After text is set, decide if fade is needed
+    requestAnimationFrame(() => {
+      if (descEl.scrollHeight <= descEl.clientHeight + 2) {
+        descEl.classList.add('fits');
+      } else {
+        descEl.addEventListener('scroll', () => {
+          const atEnd = descEl.scrollTop + descEl.clientHeight >= descEl.scrollHeight - 4;
+          descEl.classList.toggle('at-end', atEnd);
+        });
+      }
+    });
     card.querySelector('.meta').textContent = `PUBLISHED · ${timeStr}`;
   } catch (err) {
     card.classList.remove('loading');
